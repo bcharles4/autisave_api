@@ -48,6 +48,31 @@ export const deleteUser = async (req, res) => {
 };
 
 
+export const loginUser = async (req, res) => {
+    const { username } = req.body; // Extract the username from the request body
+
+    if (!username) {
+        return res.status(400).json({ success: false, message: "Username is required" });
+    }
+
+    try {
+        // Check if the user exists in the database
+        const user = await Users.findOne({ gameID: username }); // Assuming `gameID` is the username field in your schema
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // Respond with success if user exists
+        res.status(200).json({ success: true, message: "Login successful", data: user });
+    } catch (error) {
+        // Handle any errors
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
+
 
 
 // export const deletePatient = async (req, res) => {
