@@ -107,3 +107,32 @@ export const loginUser = async (req, res) => {
 //         });
 //     }
 // };
+
+
+
+export const updateUserScore = async (req, res) => {
+    const { gameID, score } = req.body;
+
+    if (!gameID || typeof score !== "number") {
+        return res.status(400).json({ success: false, message: "Invalid data" });
+    }
+
+    try {
+        // Find the user by gameID
+        let user = await Users.findOne({ gameID });
+
+        if (user) {
+            // User exists; update their score
+            user.score += score; // Add the new score to the existing score
+            await user.save();
+            return res.status(200).json({ success: true, message: "Score updated successfully", data: user });
+        } else {
+            // User doesn't exist; create a new user
+            const newUser = new Users({ gameID, age: req.body.age, score });
+            await newUser.save();
+            return res.status(201).json({ success: true, message: "User created and score saved", data: newUser });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
